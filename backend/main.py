@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.api.llm import router as llm_router
 from backend.core.config import settings
+from backend.api.screening import router as screening_router
 
 
 app = FastAPI(
@@ -25,6 +26,7 @@ app.add_middleware(
 
 
 app.include_router(llm_router)
+app.include_router(screening_router)
 
 
 @app.get("/")
