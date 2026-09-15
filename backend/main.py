@@ -20,6 +20,12 @@ from backend.api.llm import (
 from backend.api.screening import (
     router as screening_router,
 )
+from backend.api.interviews import (
+    router as interviews_router,
+)
+from backend.api.recruiter import (
+    router as recruiter_router,
+)
 
 
 app = FastAPI(
@@ -62,6 +68,13 @@ app.include_router(
 
 app.include_router(
     applications_router
+)
+app.include_router(
+    recruiter_router
+)
+
+app.include_router(
+    interviews_router
 )
 
 

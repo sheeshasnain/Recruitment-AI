@@ -14,6 +14,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.models.base import Base
 
+from sqlalchemy import Boolean
+
 
 class Application(Base):
     __tablename__ = "applications"
@@ -116,4 +118,17 @@ class Application(Base):
         "ApplicationStatusHistory",
         back_populates="application",
         cascade="all, delete-orphan",
+    )
+
+    recruiter_decision: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
+    recruiter_notes: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+    approved_for_interview: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
     )
