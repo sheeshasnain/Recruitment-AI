@@ -4,15 +4,21 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    # Application
     app_name: str = "Recruitment AI"
     app_env: str = "development"
     debug: bool = True
 
+    # Backend
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000
 
+    # Groq
     groq_api_key: str
-    groq_model: str ="openai/gpt-oss-120b"
+    groq_model: str = "llama-3.3-70b-versatile"
+
+    # Database
+    database_url: str = "sqlite:///./data/recruitment.db"
 
     model_config = SettingsConfigDict(
         env_file=".env",

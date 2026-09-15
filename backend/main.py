@@ -5,6 +5,22 @@ from backend.api.llm import router as llm_router
 from backend.core.config import settings
 from backend.api.screening import router as screening_router
 
+from backend.api.applications import (
+    router as applications_router,
+)
+from backend.api.candidates import (
+    router as candidates_router,
+)
+from backend.api.jobs import (
+    router as jobs_router,
+)
+from backend.api.llm import (
+    router as llm_router,
+)
+from backend.api.screening import (
+    router as screening_router,
+)
+
 
 app = FastAPI(
     title=settings.app_name,
@@ -27,6 +43,26 @@ app.add_middleware(
 
 app.include_router(llm_router)
 app.include_router(screening_router)
+
+app.include_router(
+    llm_router
+)
+
+app.include_router(
+    screening_router
+)
+
+app.include_router(
+    candidates_router
+)
+
+app.include_router(
+    jobs_router
+)
+
+app.include_router(
+    applications_router
+)
 
 
 @app.get("/")
