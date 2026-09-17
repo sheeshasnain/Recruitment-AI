@@ -27,6 +27,18 @@ from backend.api.recruiter import (
     router as recruiter_router,
 )
 
+from backend.api.communications import (
+    router as communications_router,
+)
+
+from backend.api.scheduling import (
+    router as scheduling_router,
+)
+
+from backend.api.tool_logs import (
+    router as tool_logs_router,
+)
+
 
 app = FastAPI(
     title=settings.app_name,
@@ -77,6 +89,17 @@ app.include_router(
     interviews_router
 )
 
+app.include_router(
+    scheduling_router
+)
+
+app.include_router(
+    communications_router
+)
+
+app.include_router(
+    tool_logs_router
+)
 
 @app.get("/")
 async def root():

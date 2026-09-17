@@ -1,8 +1,12 @@
 # Environment variables
 .env
+credentials.json
+token.json
+
 
 # Python
 __pycache__/
+*.pyc
 *.py[cod]
 *.pyo
 *.pyd
