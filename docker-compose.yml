@@ -1,0 +1,69 @@
+services:
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+
+    container_name: recruitment_backend
+
+    env_file:
+      - .env
+
+    environment:
+      APP_ENV: docker
+      DEBUG: "false"
+
+      DATABASE_URL: sqlite:////app/data/recruitment.db
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - recruitment_data:/app/data
+      - recruitment_logs:/app/logs
+
+      # Google OAuth files are mounted at runtime.
+      # They are NOT copied into the Docker image.
+      - ./credentials.json:/app/credentials.json:ro
+      - ./token.json:/app/token.json
+
+    restart: unless-stopped
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+
+    container_name: recruitment_frontend
+
+    environment:
+      API_BASE_URL: http://backend:8000
+
+    ports:
+      - "8501:8501"
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+
+volumes:
+  recruitment_data:
+  recruitment_logs:

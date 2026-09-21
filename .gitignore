@@ -1,51 +1,71 @@
-# Environment variables
+# ============================================
+# Environment / Secrets
+# ============================================
+
 .env
-credentials.json
-token.json
+.env.*
+!.env.example
 
-
-# Python
-__pycache__/
-*.pyc
-*.py[cod]
-*.pyo
-*.pyd
-
-# Virtual environment
-.venv/
-venv/
-
-# IDE
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Databases
-*.db
-*.sqlite
-*.sqlite3
-data/*.db
-
-# Logs
-*.log
-logs/
-
-# Tests
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Streamlit
-.streamlit/secrets.toml
-
-# Credentials
 credentials.json
 token.json
 client_secret*.json
 
-# Generated files
+# ============================================
+# Python
+# ============================================
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+
+# ============================================
+# Database / Runtime Data
+# ============================================
+
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+# ============================================
+# Logs
+# ============================================
+
+*.log
+logs/
+
+# ============================================
+# Testing
+# ============================================
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ============================================
+# Streamlit
+# ============================================
+
+.streamlit/secrets.toml
+
+# ============================================
+# IDE / OS
+# ============================================
+
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ============================================
+# Generated / Temporary
+# ============================================
+
 uploads/
 temp/
+current_packages.txt

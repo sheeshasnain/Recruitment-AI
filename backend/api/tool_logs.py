@@ -33,6 +33,12 @@ def get_tool_logs(
             "entity_type": log.entity_type,
             "entity_id": log.entity_id,
             "status": log.status,
+            "request_payload": (
+                log.request_payload
+            ),
+            "response_payload": (
+                log.response_payload
+            ),
             "error": log.error_message,
             "created_at": log.created_at,
         }

@@ -29,9 +29,9 @@ from backend.schemas.application import (
 from backend.schemas.job import (
     JobInput,
 )
-import logging
+# import logging
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 router = APIRouter(
@@ -253,22 +253,6 @@ async def screen_application(
     return application
 
 
-@router.get(
-    "",
-    response_model=list[ApplicationRead],
-)
-def list_applications(
-    db: Session = Depends(get_db),
-):
-
-    return (
-        db.query(Application)
-        .order_by(
-            Application.created_at.desc()
-        )
-        .all()
-    )
-
 
 @router.get(
     "/{application_id}",
@@ -291,3 +275,159 @@ def get_application(
         )
 
     return application
+
+@router.get("")
+def list_applications(
+    db: Session = Depends(get_db),
+):
+    applications = (
+        db.query(Application)
+        .order_by(
+            Application.created_at.desc()
+        )
+        .all()
+    )
+
+    results = []
+
+    for application in applications:
+
+        candidate = db.get(
+            Candidate,
+            application.candidate_id,
+        )
+
+        job = db.get(
+            Job,
+            application.job_id,
+        )
+
+        results.append(
+            {
+                # ==================================
+                # APPLICATION
+                # ==================================
+
+                "id": application.id,
+
+                "candidate_id": (
+                    application.candidate_id
+                ),
+
+                "candidate_name": (
+                    candidate.name
+                    if candidate
+                    else "Unknown Candidate"
+                ),
+
+                "candidate_email": (
+                    candidate.email
+                    if candidate
+                    else None
+                ),
+
+                "job_id": (
+                    application.job_id
+                ),
+
+                "job_title": (
+                    job.title
+                    if job
+                    else "Unknown Job"
+                ),
+
+                "status": (
+                    application.status
+                ),
+
+                # ==================================
+                # AI SCREENING
+                # ==================================
+
+                "screening_route": (
+                    application.screening_route
+                ),
+
+                "matched_skills": (
+                    application.matched_skills
+                    or []
+                ),
+
+                "missing_skills": (
+                    application.missing_skills
+                    or []
+                ),
+
+                "strengths": (
+                    application.strengths
+                    or []
+                ),
+
+                "concerns": (
+                    application.concerns
+                    or []
+                ),
+
+                "skills_score": (
+                    application.skills_score
+                ),
+
+                "experience_score": (
+                    application.experience_score
+                ),
+
+                "overall_score": (
+                    application.overall_score
+                ),
+
+                "reasoning": (
+                    application.reasoning
+                ),
+
+                # ==================================
+                # RECRUITER SCREENING DECISION
+                # ==================================
+
+                "recruiter_decision": (
+                    application.recruiter_decision
+                ),
+
+                "recruiter_notes": (
+                    application.recruiter_notes
+                ),
+
+                "approved_for_interview": (
+                    application.approved_for_interview
+                ),
+
+                # ==================================
+                # FINAL RECRUITER DECISION
+                # ==================================
+
+                "final_decision": (
+                    application.final_decision
+                ),
+
+                "final_decision_notes": (
+                    application.final_decision_notes
+                ),
+
+                "final_decision_at": (
+                    application.final_decision_at
+                ),
+
+                # ==================================
+                # TIMESTAMPS
+                # ==================================
+
+                "created_at": (
+                    application.created_at
+                ),
+
+                "updated_at": (
+                    application.updated_at
+                ),
+            }
+        )
+
+    return results

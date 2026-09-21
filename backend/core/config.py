@@ -2,6 +2,19 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from pathlib import Path
+from dotenv import load_dotenv
+
+
+BASE_DIR = Path(__file__).resolve().parents[2]
+
+ENV_FILE = BASE_DIR / ".env"
+
+load_dotenv(
+    dotenv_path=ENV_FILE,
+    override=False,
+)
+
 
 class Settings(BaseSettings):
     # Application
@@ -19,6 +32,12 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str = "sqlite:///./data/recruitment.db"
+
+    langsmith_tracing: bool = False
+    langsmith_api_key: str | None = None
+    langsmith_project: str = (
+        "AI Recruitment Agent"
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env",

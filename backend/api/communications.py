@@ -21,6 +21,7 @@ from backend.models.tool_action_log import ToolActionLog
 from backend.schemas.communication import (
     CommunicationApprovalRequest,
     CommunicationDraftRequest,
+    CommunicationUpdateRequest,
 )
 from backend.tools.gmail_tool import (
     send_candidate_email,
@@ -136,6 +137,115 @@ async def create_communication_draft(
         "body": communication.body,
     }
 
+
+# ==================================================
+# UPDATE COMMUNICATION DRAFT
+# ==================================================
+
+@router.put("/{communication_id}")
+def update_communication_draft(
+    communication_id: int,
+    payload: CommunicationUpdateRequest,
+    db: Session = Depends(get_db),
+):
+
+    clean_subject = (
+        payload.subject.strip()
+    )
+
+    clean_body = (
+        payload.body.strip()
+    )
+
+
+    if len(clean_subject) < 3:
+
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "Subject must contain at least "
+                "3 non-whitespace characters."
+            ),
+        )
+
+
+    if len(clean_body) < 10:
+    
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "Email body must contain at least "
+                "10 non-whitespace characters."
+            ),
+        )
+
+    communication = db.get(
+        CandidateCommunication,
+        communication_id,
+    )
+
+    if not communication:
+        raise HTTPException(
+            status_code=404,
+            detail="Communication not found.",
+        )
+
+    # Only unsent drafts can be edited.
+    if communication.status != "draft":
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "Only draft communications "
+                "can be edited."
+            ),
+        )
+
+    communication.subject = (
+        clean_subject
+    )
+
+    communication.body = (
+        clean_body
+    )
+
+    try:
+
+        db.commit()
+        db.refresh(
+            communication
+        )
+
+    except Exception:
+
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "Unable to update "
+                "communication draft."
+            ),
+        )
+
+    return {
+        "communication_id": (
+            communication.id
+        ),
+        "status": (
+            communication.status
+        ),
+        "recipient": (
+            communication.recipient_email
+        ),
+        "subject": (
+            communication.subject
+        ),
+        "body": (
+            communication.body
+        ),
+    }
+
+
 @router.post("/{communication_id}/approve")
 def approve_communication(
     communication_id: int,
@@ -241,6 +351,110 @@ def approve_communication(
             status_code=502,
             detail="Email delivery failed.",
         )
+
+
+# ==================================================
+# LIST ALL COMMUNICATIONS
+# ==================================================
+
+@router.get("")
+def list_communications(
+    db: Session = Depends(get_db),
+):
+
+    communications = (
+        db.query(
+            CandidateCommunication
+        )
+        .order_by(
+            CandidateCommunication
+            .created_at
+            .desc()
+        )
+        .all()
+    )
+
+    results = []
+
+    for communication in communications:
+
+        application = db.get(
+            Application,
+            communication.application_id,
+        )
+
+        candidate = None
+        job = None
+
+        if application:
+
+            candidate = db.get(
+                Candidate,
+                application.candidate_id,
+            )
+
+            job = db.get(
+                Job,
+                application.job_id,
+            )
+
+        results.append(
+            {
+                "communication_id": (
+                    communication.id
+                ),
+                "application_id": (
+                    communication.application_id
+                ),
+                "candidate_id": (
+                    candidate.id
+                    if candidate
+                    else None
+                ),
+                "candidate_name": (
+                    candidate.name
+                    if candidate
+                    else "Unknown Candidate"
+                ),
+                "candidate_email": (
+                    candidate.email
+                    if candidate
+                    else communication.recipient_email
+                ),
+                "job_title": (
+                    job.title
+                    if job
+                    else "Unknown Job"
+                ),
+                "communication_type": (
+                    communication.communication_type
+                ),
+                "recipient": (
+                    communication.recipient_email
+                ),
+                "subject": (
+                    communication.subject
+                ),
+                "body": (
+                    communication.body
+                ),
+                "status": (
+                    communication.status
+                ),
+                "provider_message_id": (
+                    communication.provider_message_id
+                ),
+                "created_at": (
+                    communication.created_at
+                ),
+                "sent_at": (
+                    communication.sent_at
+                ),
+            }
+        )
+
+    return results
+
 
 @router.get("/applications/{application_id}")
 def get_communications(

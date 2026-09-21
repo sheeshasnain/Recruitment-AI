@@ -1,0 +1,25 @@
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir \
+    --upgrade pip \
+    && pip install --no-cache-dir \
+    -r requirements.txt
+
+COPY backend ./backend
+COPY migrations ./migrations
+COPY alembic.ini .
+COPY backend-entrypoint.sh .
+
+RUN mkdir -p /app/data /app/logs \
+    && chmod +x /app/backend-entrypoint.sh
+
+EXPOSE 8000
+
+ENTRYPOINT ["/app/backend-entrypoint.sh"]

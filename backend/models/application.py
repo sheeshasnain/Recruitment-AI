@@ -132,3 +132,24 @@ class Application(Base):
         Boolean,
         default=False,
     )
+
+    final_decision: Mapped[str | None] = (
+        mapped_column(
+            String(50),
+            nullable=True,
+            )
+    )
+
+    final_decision_notes: Mapped[
+        str | None
+        ] = mapped_column(
+            Text,
+            nullable=True,
+    )
+
+    final_decision_at: Mapped[
+        datetime | None
+        ] = mapped_column(
+            DateTime(timezone=True),
+            nullable=True,
+    )

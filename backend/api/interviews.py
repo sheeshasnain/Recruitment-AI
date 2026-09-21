@@ -16,9 +16,6 @@ from backend.models.interview_question import (
     InterviewQuestion,
 )
 from backend.models.job import Job
-from backend.schemas.interview import (
-    PrepareInterviewRequest,
-)
 
 from datetime import datetime, timezone
 
@@ -750,6 +747,90 @@ Candidate Answer:
             evaluation.summary,
     }
 
+@router.get("")
+def list_interviews(
+    db: Session = Depends(get_db),
+):
+    interviews = (
+        db.query(Interview)
+        .order_by(Interview.id.desc())
+        .all()
+    )
+
+    results = []
+
+    for interview in interviews:
+        application = db.get(
+            Application,
+            interview.application_id,
+        )
+
+        candidate = None
+        job = None
+
+        if application:
+            candidate = db.get(
+                Candidate,
+                application.candidate_id,
+            )
+
+            job = db.get(
+                Job,
+                application.job_id,
+            )
+
+        evaluation = (
+            db.query(InterviewEvaluation)
+            .filter(
+                InterviewEvaluation.interview_id
+                == interview.id
+            )
+            .first()
+        )
+
+        results.append(
+            {
+                "interview_id": interview.id,
+                "application_id": (
+                    interview.application_id
+                ),
+                "candidate_name": (
+                    candidate.name
+                    if candidate
+                    else "Unknown Candidate"
+                ),
+                "candidate_email": (
+                    candidate.email
+                    if candidate
+                    else None
+                ),
+                "job_title": (
+                    job.title
+                    if job
+                    else "Unknown Job"
+                ),
+                "status": interview.status,
+                "interview_type": (
+                    interview.interview_type
+                ),
+                "created_at": interview.created_at,
+                "started_at": interview.started_at,
+                "completed_at": interview.completed_at,
+                "overall_score": (
+                    evaluation.overall_score
+                    if evaluation
+                    else None
+                ),
+                "recommendation": (
+                    evaluation.recommendation
+                    if evaluation
+                    else None
+                ),
+            }
+        )
+
+    return results
+
 @router.get(
     "/{interview_id}"
 )
@@ -849,24 +930,42 @@ def get_interview(
             question_data,
 
         "evaluation":
-            (
-                {
-                    "overall_score":
-                        evaluation.overall_score,
+        (
+            {
+                "evaluation_id":
+                    evaluation.id,
 
-                    "recommendation":
-                        evaluation.recommendation,
+                "technical_score":
+                    evaluation.technical_score,
 
-                    "strengths":
-                        evaluation.strengths,
+                "communication_score":
+                    evaluation.communication_score,
 
-                    "concerns":
-                        evaluation.concerns,
+                "problem_solving_score":
+                    evaluation.problem_solving_score,
 
-                    "summary":
-                        evaluation.summary,
-                }
-                if evaluation
-                else None
-            ),
+                "experience_score":
+                    evaluation.experience_score,
+
+                "overall_score":
+                    evaluation.overall_score,
+
+                "recommendation":
+                    evaluation.recommendation,
+
+                "strengths":
+                    evaluation.strengths,
+
+                "concerns":
+                    evaluation.concerns,
+
+                "summary":
+                    evaluation.summary,
+
+                "created_at":
+                    evaluation.created_at,
+            }
+            if evaluation
+            else None
+        ),
     }
