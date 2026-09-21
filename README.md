@@ -299,7 +299,7 @@ Install:
 Clone the repository:
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
+git clone https://github.com/sheeshasnain/Recruitment-AI.git
 cd <YOUR_REPOSITORY_DIRECTORY>
 ```
 
