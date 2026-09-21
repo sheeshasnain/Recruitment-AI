@@ -124,6 +124,7 @@ External actions such as Google Calendar and Gmail operations are recorded in th
 ---
 
 ## System Architecture
+![AI Recruitment & Interview Operations Agent Architecture](assets/architecture-diagram.png)
 
 ```text
                          Recruiter
