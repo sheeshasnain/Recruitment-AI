@@ -52,6 +52,23 @@ def get_applications():
 
     return response.json()
 
+def screen_candidate_for_job(
+    *,
+    candidate_id: int,
+    job_id: int,
+):
+    response = httpx.post(
+        f"{API_BASE_URL}/api/v1/applications/screen",
+        json={
+            "candidate_id": candidate_id,
+            "job_id": job_id,
+        },
+        timeout=120,
+    )
+
+    response.raise_for_status()
+
+    return response.json()
 # ==================================================
 # JOBS
 # ==================================================
